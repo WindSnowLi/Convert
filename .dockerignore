@@ -1,0 +1,70 @@
+# .dockerignore - Docker 构建时忽略的文件
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 虚拟环境
+venv/
+env/
+ENV/
+.venv/
+
+# 开发工具
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# 文档
+README.md
+使用指南.md
+NCM格式说明.md
+*.md
+
+# 脚本
+deploy_linux.sh
+deploy_docker.sh
+启动.bat
+安装FFmpeg.bat
+安装FFmpeg.ps1
+start.ps1
+test_ncm.py
+
+# 数据目录
+uploads/*
+outputs/*
+data/
+logs/
+*.log
+
+# 临时文件
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Docker 文件
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# 测试文件
+test_*.py
+*_test.py
+tests/

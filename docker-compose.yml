@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  media-converter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: media-converter
+    restart: unless-stopped
+    ports:
+      - "52113:52113"
+    volumes:
+      # 持久化上传和输出目录（可选）
+      - ./data/uploads:/app/uploads
+      - ./data/outputs:/app/outputs
+    environment:
+      - TZ=Asia/Shanghai
+      - FLASK_ENV=production
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:52113/formats')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - converter-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  converter-network:
+    driver: bridge
+
+volumes:
+  uploads:
+  outputs:

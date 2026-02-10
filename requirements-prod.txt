@@ -1,0 +1,16 @@
+# Flask 依赖
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# 图片处理
+Pillow==10.1.0
+
+# 加密解密
+pycryptodome==3.19.0
+
+# 网易云音乐
+pyncm
+
+# WSGI 服务器（可选，生产环境推荐）
+gunicorn==21.2.0; sys_platform != 'win32'
+waitress==2.1.2; sys_platform == 'win32'

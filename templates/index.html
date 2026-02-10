@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💝 格式转换工具 - 为你定制</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            max-width: 600px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 40px;
+            font-size: 1em;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 20px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .upload-area.dragover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #fff;
+        }
+
+        .upload-area.dragover .upload-icon,
+        .upload-area.dragover .upload-text {
+            color: #fff;
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            color: #667eea;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .upload-hint {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-info {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .file-info.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+
+        .format-selector {
+            margin-top: 20px;
+        }
+
+        .format-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .format-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .format-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .format-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .format-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #764ba2;
+        }
+
+        .convert-btn {
+            width: 100%;
+            padding: 18px;
+            margin-top: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .convert-btn.show {
+            display: block;
+        }
+
+        .convert-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .convert-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .progress {
+            display: none;
+            margin-top: 20px;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress.show {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: progress-animation 1.5s infinite;
+        }
+
+        @keyframes progress-animation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .category-tab {
+            padding: 10px 25px;
+            border: 2px solid transparent;
+            background: #f0f0f0;
+            color: #666;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .category-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #764ba2;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .heart {
+            color: #ff6b6b;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.1);
+            }
+            50% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💝 格式转换工具</h1>
+        <p class="subtitle">为你精心打造的多媒体转换神器</p>
+        
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">点击或拖拽文件到这里</div>
+            <div class="upload-hint">支持音频、视频、图片格式转换 | 支持网易云音乐 NCM 解密</div>
+            <input type="file" id="fileInput" accept="audio/*,video/*,image/*,.ncm">
+        </div>
+
+        <div class="file-info" id="fileInfo">
+            <div class="file-name" id="fileName"></div>
+            
+            <div class="category-tabs" id="categoryTabs"></div>
+            
+            <div class="format-selector">
+                <label class="format-label">选择输出格式：</label>
+                <div class="format-buttons" id="formatButtons"></div>
+            </div>
+        </div>
+
+        <button class="convert-btn" id="convertBtn">
+            ✨ 开始转换
+        </button>
+
+        <div class="progress" id="progress">
+            <div class="progress-bar"></div>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="footer">
+            用 <span class="heart">❤️</span> 制作
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const categoryTabs = document.getElementById('categoryTabs');
+        const formatButtons = document.getElementById('formatButtons');
+        const convertBtn = document.getElementById('convertBtn');
+        const progress = document.getElementById('progress');
+        const message = document.getElementById('message');
+
+        let selectedFile = null;
+        let selectedFormat = null;
+        let formats = {
+            audio: [],
+            video: [],
+            image: [],
+            ncm: []
+        };
+
+        // 获取支持的格式
+        fetch('/formats')
+            .then(response => response.json())
+            .then(data => {
+                formats = data;
+            });
+
+        // 上传区域点击
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // 文件选择
+        fileInput.addEventListener('change', (e) => {
+            handleFile(e.target.files[0]);
+        });
+
+        // 拖拽功能
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+        function handleFile(file) {
+            if (!file) return;
+
+            selectedFile = file;
+            selectedFormat = null;
+            
+            fileName.textContent = `📄 ${file.name}`;
+            fileInfo.classList.add('show');
+            
+            // 检测文件类型
+            const fileType = getFileType(file);
+            showFormatOptions(fileType);
+            
+            convertBtn.classList.remove('show');
+            message.classList.remove('show');
+        }
+
+        function getFileType(file) {
+            const type = file.type;
+            if (type.startsWith('audio/')) return 'audio';
+            if (type.startsWith('video/')) return 'video';
+            if (type.startsWith('image/')) return 'image';
+            
+            // 根据扩展名判断
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (ext === 'ncm') return 'ncm';
+            if (formats.audio.includes(ext)) return 'audio';
+            if (formats.video.includes(ext)) return 'video';
+            if (formats.image.includes(ext)) return 'image';
+            
+            return 'unknown';
+        }
+
+        function showFormatOptions(type) {
+            categoryTabs.innerHTML = '';
+            formatButtons.innerHTML = '';
+
+            if (type === 'unknown') {
+                showMessage('不支持的文件格式', 'error');
+                return;
+            }
+
+            const categories = {
+                'audio': { label: '🎵 音频', formats: formats.audio, icon: '🎵' },
+                'video': { label: '🎬 视频', formats: formats.video, icon: '🎬' },
+                'image': { label: '🖼️ 图片', formats: formats.image, icon: '🖼️' },
+                'ncm': { label: '☁️ 网易云', formats: formats.audio, icon: '☁️' }
+            };
+
+            // 如果是 NCM 文件，显示元数据信息
+            if (type === 'ncm') {
+                showNcmInfo(selectedFile);
+            }
+
+            let currentCategory = type;
+
+            // 创建分类标签
+            Object.keys(categories).forEach(cat => {
+                const tab = document.createElement('div');
+                tab.className = 'category-tab';
+                tab.textContent = categories[cat].label;
+                if (cat === type) tab.classList.add('active');
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentCategory = cat;
+                    showFormats(cat);
+                });
+                categoryTabs.appendChild(tab);
+            });
+
+            showFormats(currentCategory);
+        }
+
+        function showFormats(category) {
+            formatButtons.innerHTML = '';
+            selectedFormat = null;
+            convertBtn.classList.remove('show');
+
+            const categoryFormats = formats[category] || [];
+            
+            categoryFormats.forEach(format => {
+                const btn = document.createElement('button');
+                btn.className = 'format-btn';
+                btn.textContent = format;
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedFormat = format;
+                    convertBtn.classList.add('show');
+                });
+                formatButtons.appendChild(btn);
+            });
+        }
+
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile || !selectedFormat) return;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('format', selectedFormat);
+
+            convertBtn.disabled = true;
+            convertBtn.textContent = '⏳ 转换中...';
+            progress.classList.add('show');
+            message.classList.remove('show');
+
+            try {
+                const response = await fetch('/convert', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || '转换失败');
+                }
+
+                // 下载文件
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${selectedFile.name.split('.')[0]}.${selectedFormat}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showMessage('✅ 转换成功！文件已下载', 'success');
+            } catch (error) {
+                showMessage(`❌ ${error.message}`, 'error');
+            } finally {
+                convertBtn.disabled = false;
+                convertBtn.textContent = '✨ 开始转换';
+                progress.classList.remove('show');
+            }
+        });
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = `message ${type} show`;
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 5000);
+        }
+
+        async function showNcmInfo(file) {
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const response = await fetch('/ncm-info', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const info = await response.json();
+                    if (!info.error) {
+                        let infoText = `🎵 ${info.musicName || '未知歌曲'}`;
+                        if (info.artist && info.artist[0] && info.artist[0][1]) {
+                            infoText += ` - ${info.artist[0][1]}`;
+                        }
+                        if (info.album && info.album !== '未知') {
+                            infoText += ` [${info.album}]`;
+                        }
+                        fileName.textContent = `📄 ${file.name}\n${infoText}`;
+                        fileName.style.whiteSpace = 'pre-line';
+                    }
+                }
+            } catch (e) {
+                console.log('无法获取 NCM 元数据:', e);
+            }
+        }
+    </script>
+</body>
+</html>
