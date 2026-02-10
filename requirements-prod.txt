@@ -6,7 +6,7 @@ Werkzeug==3.1.5
 Pillow==10.1.0
 
 # 加密解密
-pycryptodome==3.19.0
+pycryptodome==3.19.1
 
 # 网易云音乐
 pyncm
