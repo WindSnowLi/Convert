@@ -12,5 +12,5 @@ pycryptodome==3.19.1
 pyncm
 
 # WSGI 服务器（可选，生产环境推荐）
-gunicorn==21.2.0; sys_platform != 'win32'
+gunicorn==22.0.0; sys_platform != 'win32'
 waitress==3.0.1; sys_platform == 'win32'
